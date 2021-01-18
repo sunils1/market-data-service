@@ -15,8 +15,7 @@ import java.util.*;
 @Slf4j
 @Component
 public class DummyDataCollector extends AbstractDataCollector {
-    private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList("A", "AA", "AAPL"));
-    /*
+    private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList(
             "A", "AA", "AAPL", "ABC", "ABT", "ACE", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADT", "AEE", "AEP", "AES", "AET",
             "AFL", "AGN", "AIG", "AIV", "AIZ", "AKAM", "ALL", "ALTR", "ALXN", "AMAT", "AMD", "AMGN", "AMP", "AMT", "AMZN", "AN",
             "ANF", "AON", "APA", "APC", "APD", "APH", "APOL", "ARG", "ATI", "AVB", "AVP", "AVY", "AXP", "AZO", "BA", "BAC", "BAX",
@@ -48,7 +47,6 @@ public class DummyDataCollector extends AbstractDataCollector {
             "WPO", "WPX", "WU", "WY", "WYN", "WYNN", "X", "XEL", "XL", "XLNX", "XOM", "XRAY", "XRX", "XYL", "YHOO", "YUM", "ZION", "ZMH"
     ));
 
-    */
     private String getExchange() {
         return "NASDAQ";
     }
