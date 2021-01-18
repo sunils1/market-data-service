@@ -41,20 +41,18 @@ public class TimeSeriesRepositoryImpl implements Repository {
 
         long timestamp = marketData.getDateTimeU().toInstant().toEpochMilli();
 
-        Measurement price = new Measurement(
+        this.redisTimeSeries.add(
                 getTimeSeriesKey(marketData.getSource().name(), marketData.getSymbol(), PRICE),
                 timestamp,
-                marketData.getPrice());
+                marketData.getPrice(), labels);
 
-        Measurement volume = new Measurement(
+        this.redisTimeSeries.add(
                 getTimeSeriesKey(marketData.getSource().name(), marketData.getSymbol(), VOLUME),
                 timestamp,
-                marketData.getVolume());
-
-        List<Object> rets = this.redisTimeSeries.madd(price, volume);
-        log.info("Added to ts with timestamp: {} ({}), price: {}, volume: {}, labels : {}, ret : {}",
+                marketData.getVolume(), labels);
+        log.info("Added to ts with timestamp: {} ({}), price: {}, volume: {}, labels : {}",
                 timestamp, marketData.getDateTimeU(), marketData.getPrice(),
-                marketData.getVolume(), labels, rets);
+                marketData.getVolume(), labels );
     }
 
     /*** Get latest date for single
