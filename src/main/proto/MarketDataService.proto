@@ -10,7 +10,8 @@ option java_outer_classname = "MarketDataProto";
 service MarketDataService {
   // Sends heartbeat
   rpc heartbeat (HeartbeatRequest) returns (HeartbeatReply) {}
-  rpc marketdata (MarketDataRequest) returns (MarketDataReply) {}
+  rpc spot (SpotRequest) returns (MarketDataReply) {}
+  rpc timeseries (TimeSeriesRequest) returns (TimeSeriesMarketDataReply) {}
 }
 
 // heartbeat request/reply
@@ -22,9 +23,8 @@ message HeartbeatReply {
 }
 
 // MarketData request/reply
-message MarketDataRequest {
-  string type = 1; // spot, eod
-  string symbol = 2; // IBM/TSLA
+message SpotRequest {
+  string symbol = 1;
 }
 
 message MarketDataReply {
@@ -33,5 +33,15 @@ message MarketDataReply {
   string exchange = 3;
   double price = 4;
   string source = 5;
-  string comment = 6;
+  double volume = 6;
+  string comment = 7;
+}
+
+message TimeSeriesRequest {
+  string symbol = 1;
+  uint32 row_count = 2; // row count, 0 = use default
+}
+
+message TimeSeriesMarketDataReply {
+  repeated MarketDataReply reply = 1;
 }

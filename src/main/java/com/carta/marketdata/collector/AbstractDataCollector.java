@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractDataCollector implements DataCollector<String> {
     abstract public Set<String> getSymbols();
 
-    private static final int FIXED_RATE = 600000;
+    private static final int FIXED_RATE = 60000;
     final private Repository repository;
 
     protected AbstractDataCollector(Repository repository) {
@@ -23,7 +23,7 @@ public abstract class AbstractDataCollector implements DataCollector<String> {
     private void updateRepo(String symbol) {
         MarketData data = getData(symbol);
         log.info("Updating {}, with {}", symbol, data);
-        repository.update(data);
+        repository.add(data);
     }
     @Override
     @Scheduled(fixedRate = FIXED_RATE)

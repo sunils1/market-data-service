@@ -1,6 +1,7 @@
 package com.carta.marketdata.collector;
 
 import com.carta.marketdata.model.MarketData;
+import com.carta.marketdata.model.SourceType;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,8 @@ import java.util.*;
 @Slf4j
 @Component
 public class DummyDataCollector extends AbstractDataCollector {
-    private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList(
+    private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList("A", "AA", "AAPL"));
+    /*
             "A", "AA", "AAPL", "ABC", "ABT", "ACE", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADT", "AEE", "AEP", "AES", "AET",
             "AFL", "AGN", "AIG", "AIV", "AIZ", "AKAM", "ALL", "ALTR", "ALXN", "AMAT", "AMD", "AMGN", "AMP", "AMT", "AMZN", "AN",
             "ANF", "AON", "APA", "APC", "APD", "APH", "APOL", "ARG", "ATI", "AVB", "AVP", "AVY", "AXP", "AZO", "BA", "BAC", "BAX",
@@ -46,12 +48,12 @@ public class DummyDataCollector extends AbstractDataCollector {
             "WPO", "WPX", "WU", "WY", "WYN", "WYNN", "X", "XEL", "XL", "XLNX", "XOM", "XRAY", "XRX", "XYL", "YHOO", "YUM", "ZION", "ZMH"
     ));
 
-
+    */
     private String getExchange() {
         return "NASDAQ";
     }
 
-    private long getVolume() {
+    private double getVolume() {
         return Math.round(Math.random() * 1000);
     }
 
@@ -59,9 +61,8 @@ public class DummyDataCollector extends AbstractDataCollector {
         return ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
-    private BigDecimal getPrice(String sym) {
-        double price = Math.random() * (sym.hashCode() + System.currentTimeMillis() % 1000) / 1000.0;
-        return new BigDecimal(price, MathContext.DECIMAL32);
+    private double getPrice(String sym) {
+        return Math.random() * (sym.hashCode() + System.currentTimeMillis() % 1000) / 1000.0;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class DummyDataCollector extends AbstractDataCollector {
     @Override
     public MarketData getData(String symbol) {
         sleep();
-        return new MarketData(symbol, getTime(), getPrice(symbol), getExchange(), getVolume());
+        return new MarketData(symbol, getTime(), getPrice(symbol), getExchange(), SourceType.TEST, this.getVolume());
     }
 
     public DummyDataCollector(Repository repository) {

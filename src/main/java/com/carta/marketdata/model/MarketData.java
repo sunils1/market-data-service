@@ -1,18 +1,15 @@
 package com.carta.marketdata.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class MarketData implements Serializable {
     @Serial
@@ -20,7 +17,8 @@ public class MarketData implements Serializable {
 
     private String symbol;
     private ZonedDateTime dateTimeU;
-    private BigDecimal price;
+    private double price;
     private String exchange;
-    private long volume;
+    private SourceType source;
+    private double volume;
 }

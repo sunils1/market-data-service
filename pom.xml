@@ -18,6 +18,7 @@
 		<java.version>11</java.version>
 	</properties>
 
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,6 +59,13 @@
 			<artifactId>grpc-server-spring-boot-starter</artifactId>
 			<version>2.5.1.RELEASE</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.redislabs</groupId>
+			<artifactId>jredistimeseries</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
