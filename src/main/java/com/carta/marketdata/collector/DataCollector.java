@@ -1,10 +1,8 @@
 package com.carta.marketdata.collector;
 
 
-import com.carta.marketdata.model.MarketData;
-
-public interface DataCollector<T> {
+public interface DataCollector<T, R> {
     void execute();
 
-    MarketData getData(T key);
+    R getData(T key);
 }

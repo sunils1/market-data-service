@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.util.Set;
 
 @Slf4j
-public abstract class AbstractDataCollector implements DataCollector<String> {
+public abstract class AbstractDataCollector implements DataCollector<String, MarketData> {
     abstract public Set<String> getSymbols();
 
-    private static final int FIXED_RATE = 60000;
+    private static final long FIXED_RATE = 300000; // 5 minutes
     final private Repository repository;
 
     protected AbstractDataCollector(Repository repository) {
