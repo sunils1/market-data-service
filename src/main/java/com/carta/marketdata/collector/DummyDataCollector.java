@@ -12,7 +12,7 @@ import java.util.*;
 
 @Slf4j
 @Component
-public class DummyDataCollector extends AbstractDataCollector {
+public class DummyDataCollector extends MarketDataCollector {
     private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList(
             "A", "AA", "AAPL", "ABC", "ABT", "ACE", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADT", "AEE", "AEP", "AES", "AET",
             "AFL", "AGN", "AIG", "AIV", "AIZ", "AKAM", "ALL", "ALTR", "ALXN", "AMAT", "AMD", "AMGN", "AMP", "AMT", "AMZN", "AN",
