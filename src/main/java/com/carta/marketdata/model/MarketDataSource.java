@@ -1,14 +1,15 @@
 package com.carta.marketdata.model;
 
-public enum SourceType {
+public enum MarketDataSource {
     TEST("TEST"),
     TWELVE_DATA("TWELVEDATA"),
+    XPRESSFEED("XPRESSFEED"),
     MANUAL("MANUAL"),
     UNKNOWN("UNKNOWN");
 
     private final String value;
 
-    SourceType(final String text) {
+    MarketDataSource(final String text) {
         this.value = text;
     }
 

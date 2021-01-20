@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -11,14 +12,14 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class MarketData implements Serializable {
+public class MarketData implements Serializable, MarketDataIfc {
     @Serial
     private static final long serialVersionUID = -5835892724045349889L;
 
     private String symbol;
     private ZonedDateTime dateTimeU;
-    private double price;
+    private BigDecimal price;
     private String exchange;
-    private SourceType source;
-    private double volume;
+    private MarketDataSource marketDataSource;
+    private BigDecimal volume;
 }

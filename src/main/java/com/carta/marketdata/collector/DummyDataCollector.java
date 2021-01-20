@@ -1,11 +1,12 @@
 package com.carta.marketdata.collector;
 
 import com.carta.marketdata.model.MarketData;
-import com.carta.marketdata.model.SourceType;
+import com.carta.marketdata.model.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -49,8 +50,8 @@ public class DummyDataCollector extends MarketDataCollector {
         return "NASDAQ";
     }
 
-    private double getVolume() {
-        return Math.round(Math.random() * 1000);
+    private BigDecimal getVolume() {
+        return BigDecimal.valueOf(Math.round(Math.random() * 1000));
     }
 
     private ZonedDateTime getTime() {
@@ -69,7 +70,8 @@ public class DummyDataCollector extends MarketDataCollector {
     @Override
     public MarketData getData(String symbol) {
         sleep();
-        return new MarketData(symbol, getTime(), getPrice(symbol), getExchange(), SourceType.TEST, this.getVolume());
+        return new MarketData(symbol, getTime(), BigDecimal.valueOf(getPrice(symbol)),
+                getExchange(), MarketDataSource.TEST, this.getVolume());
     }
 
     public DummyDataCollector(Repository repository) {

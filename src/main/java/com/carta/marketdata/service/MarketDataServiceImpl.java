@@ -1,7 +1,7 @@
 package com.carta.marketdata.service;
 
 
-import com.carta.marketdata.model.MarketData;
+import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.repository.Repository;
 import com.carta.marketdata.service.lib.*;
 import io.grpc.stub.StreamObserver;
@@ -43,15 +43,15 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
     public void spot(SpotRequest request, StreamObserver<MarketDataReply> responseObserver) {
         String symbol = request.getSymbol();
 
-        MarketData data = repository.get(symbol);
+        MarketDataIfc data = repository.get(symbol);
         MarketDataReply reply;
         if (Optional.ofNullable(data).isPresent()) {
             reply = MarketDataReply.newBuilder()
                     .setSymbol(data.getSymbol())
-                    .setPrice(data.getPrice())
+                    .setPrice(data.getPrice().doubleValue())
                     .setDateTime(ISO_DATETIME_FORMAT.format(data.getDateTimeU()))
                     .setExchange(data.getExchange())
-                    .setVolume(data.getVolume())
+                    .setVolume(data.getVolume().doubleValue())
                     .build();
         } else {
             reply = MarketDataReply.newBuilder()
@@ -63,13 +63,13 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
         responseObserver.onCompleted();
     }
 
-    public MarketDataReply getReply(MarketData data) {
+    public MarketDataReply getReply(MarketDataIfc data) {
         return MarketDataReply.newBuilder()
                 .setSymbol(data.getSymbol())
-                .setPrice(data.getPrice())
+                .setPrice(data.getPrice().doubleValue())
                 .setDateTime(ISO_DATETIME_FORMAT.format(data.getDateTimeU()))
                 .setExchange(data.getExchange())
-                .setVolume(data.getVolume())
+                .setVolume(data.getVolume().doubleValue())
                 .build();
     }
 
@@ -82,7 +82,7 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
             rowCount = ROW_COUNT_DEFAULT;
         }
 
-        List<MarketData> all = repository.get(symbol, rowCount);
+        List<MarketDataIfc> all = repository.get(symbol, rowCount);
         TimeSeriesMarketDataReply.Builder builder = TimeSeriesMarketDataReply.newBuilder();
 
         if (Optional.ofNullable(all).isPresent()) {

@@ -1,40 +1,40 @@
 package com.carta.marketdata.repository;
 
 import com.carta.marketdata.model.MarketData;
-import com.carta.marketdata.model.SourceType;
+import com.carta.marketdata.model.MarketDataIfc;
+import com.carta.marketdata.model.MarketDataSource;
 import com.redislabs.redistimeseries.*;
 
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.carta.marketdata.constants.MarketDataConstants.*;
+
 @Slf4j
 @org.springframework.stereotype.Repository
-public class TimeSeriesRepositoryImpl implements Repository {
-    private static final String EXCHANGE = "exchange";
-    private static final String SOURCE = "source";
-    private static final String SYMBOL = "symbol";
+public class RedisRepositoryImpl implements Repository {
     private static final String KEY_SEPARATOR = ":";
-    private static final String PRICE = "price";
-    private static final String VOLUME = "volume";
     private static final int HOURS_LIMIT = 25;
 
     RedisTimeSeries redisTimeSeries;
 
-    public TimeSeriesRepositoryImpl(RedisTimeSeries redisTimeSeries) {
+    public RedisRepositoryImpl(RedisTimeSeries redisTimeSeries) {
         this.redisTimeSeries = redisTimeSeries;
     }
 
-    private String getTimeSeriesKey(String source, String symbol, String type) {
-        return "ts_market_data" + KEY_SEPARATOR + source + KEY_SEPARATOR + symbol + KEY_SEPARATOR + type;
-    }
-
+    /**
+     * Add entry to the time series
+     *
+     * @param marketData market data to be added
+     */
     @Override
     public void add(MarketData marketData) {
         Map<String, String> labels = new HashMap<>();
@@ -45,13 +45,13 @@ public class TimeSeriesRepositoryImpl implements Repository {
 
         try {
             this.redisTimeSeries.add(
-                    getTimeSeriesKey(marketData.getSource().name(), marketData.getSymbol(), PRICE),
+                    getTimeSeriesKey(marketData.getMarketDataSource().name(), marketData.getSymbol(), PRICE),
                     timestamp,
-                    marketData.getPrice(), labels);
+                    marketData.getPrice().doubleValue(), labels);
             this.redisTimeSeries.add(
-                    getTimeSeriesKey(marketData.getSource().name(), marketData.getSymbol(), VOLUME),
+                    getTimeSeriesKey(marketData.getMarketDataSource().name(), marketData.getSymbol(), VOLUME),
                     timestamp,
-                    marketData.getVolume(), labels);
+                    marketData.getVolume().doubleValue(), labels);
             log.info("Added to ts with timestamp: {} ({}), price: {}, volume: {}, labels : {}",
                     timestamp, marketData.getDateTimeU(), marketData.getPrice(),
                     marketData.getVolume(), labels);
@@ -71,7 +71,7 @@ public class TimeSeriesRepositoryImpl implements Repository {
     public MarketData get(String symbol) {
         try {
             Range[] tsData = this.redisTimeSeries.mget(true, filterSymbol(symbol), filterSource());
-            TreeMap<Long, MarketData> marketData = getMarketData(symbol, tsData);
+            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
             return Optional.ofNullable(marketData.lastEntry()).isPresent() ? marketData.lastEntry().getValue() : null;
         } catch (JedisConnectionException e) {
             log.error("Exception while trying to get data for {}, error : {}", symbol, e.getMessage());
@@ -87,7 +87,7 @@ public class TimeSeriesRepositoryImpl implements Repository {
      * @return List of MarketData
      */
     @Override
-    public List<MarketData> get(String symbol, int rowCount) {
+    public List<MarketDataIfc> get(String symbol, int rowCount) {
         try {
             long to = System.currentTimeMillis();
             long from = to - TimeUnit.HOURS.toMillis(HOURS_LIMIT);
@@ -95,7 +95,7 @@ public class TimeSeriesRepositoryImpl implements Repository {
 
             Range[] tsData = redisTimeSeries.mrevrange(from, to, null, 0L, true, rowCount, filters);
 
-            TreeMap<Long, MarketData> marketData = getMarketData(symbol, tsData);
+            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
             return new ArrayList<>(marketData.values());
         } catch (JedisException e) {
             log.error("Exception while trying to getting range of data for {}, error: {}", symbol, e.getMessage());
@@ -103,7 +103,26 @@ public class TimeSeriesRepositoryImpl implements Repository {
         }
     }
 
-    private TreeMap<Long, MarketData> getMarketData(String symbol, Range[] tsData) {
+    /**
+     * Helper function to create the ts key based on the source and symbol
+     *
+     * @param source    Source of the data
+     * @param symbol    Symbol
+     * @param type      type - price/volume etc
+     * @return          ts_market_data:source:symbol
+     */
+    private String getTimeSeriesKey(String source, String symbol, String type) {
+        return "ts_market_data" + KEY_SEPARATOR + source + KEY_SEPARATOR + symbol + KEY_SEPARATOR + type;
+    }
+
+
+    /**
+     * Helper function to transform redis TS data to MarketData
+     * @param symbol    symbol queried upon
+     * @param tsData    data to transform
+     * @return  TreeMap with the time -> Data mapping
+     */
+    private TreeMap<Long, MarketData> transform(String symbol, Range[] tsData) {
         TreeMap<Long, MarketData> marketData = new TreeMap<>();
         for (Range entry : tsData) {
             String key = entry.getKey();
@@ -117,11 +136,13 @@ public class TimeSeriesRepositoryImpl implements Repository {
                     data.setExchange(labels.getOrDefault(EXCHANGE, "-"));
                     data.setSymbol(symbol);
                     data.setDateTimeU(getUTCTime(value));
-                    data.setPrice(value.getValue());
+                    data.setPrice(BigDecimal.valueOf(value.getValue()));
+                    data.setMarketDataSource(MarketDataSource.valueOf(
+                            labels.getOrDefault(SOURCE, MarketDataSource.UNKNOWN.name())));
                 }
 
                 if (key.contains(VOLUME)) {
-                    data.setVolume(value.getValue());
+                    data.setVolume(BigDecimal.valueOf(value.getValue()));
                 }
 
                 marketData.put(time, data);
@@ -130,15 +151,28 @@ public class TimeSeriesRepositoryImpl implements Repository {
         return marketData;
     }
 
-
+    /**
+     * Returns source filters we want to apply
+     * @return  String with the formatted source filter
+     */
     private String filterSource() {
-        return SOURCE + "!=[" + SourceType.TEST + ", " + SourceType.MANUAL + "]";
+        return SOURCE + "!=[" + MarketDataSource.TEST + "]";
     }
 
+    /**
+     * Adding symbol label filters
+     * @param symbol    symbol to query on
+     * @return          String with the symbol filter applied
+     */
     private String filterSymbol(String symbol) {
         return SYMBOL + "=" + symbol;
     }
 
+    /**
+     * Helper function to get UTC time from long (ms)
+     * @param value epoch time value in ms
+     * @return      ZonedDateTime
+     */
     private ZonedDateTime getUTCTime(Value value) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(value.getTime()), ZoneId.of("UTC"));
     }
