@@ -3,7 +3,6 @@ package com.carta.marketdata.collector;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.repository.Repository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,8 +11,6 @@ import java.util.Set;
 @Slf4j
 public abstract class MarketDataCollector implements DataCollector<String, MarketDataIfc> {
     abstract public Set<String> getSymbols();
-
-    private static long FIXED_RATE;
 
     final private Repository<MarketDataIfc> repository;
 
