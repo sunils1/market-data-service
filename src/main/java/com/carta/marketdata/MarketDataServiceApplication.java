@@ -1,5 +1,6 @@
 package com.carta.marketdata;
 
+import com.carta.marketdata.helper.RestClient;
 import com.carta.marketdata.model.MarketData;
 import com.redislabs.redistimeseries.RedisTimeSeries;
 import lombok.extern.slf4j.Slf4j;

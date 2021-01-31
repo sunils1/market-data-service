@@ -20,7 +20,7 @@ import static com.carta.marketdata.constants.MarketDataConstants.*;
 
 @Slf4j
 @org.springframework.stereotype.Repository
-public class RedisRepositoryImpl implements Repository {
+public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
     private static final String KEY_SEPARATOR = ":";
     private static final int HOURS_LIMIT = 25;
 
@@ -36,7 +36,7 @@ public class RedisRepositoryImpl implements Repository {
      * @param marketData market data to be added
      */
     @Override
-    public void add(MarketData marketData) {
+    public void add(MarketDataIfc marketData) {
         Map<String, String> labels = new HashMap<>();
         labels.put(EXCHANGE, marketData.getExchange());
         labels.put(SYMBOL, marketData.getSymbol());
@@ -68,10 +68,10 @@ public class RedisRepositoryImpl implements Repository {
      * @return market data information
      */
     @Override
-    public MarketData get(String symbol) {
+    public MarketDataIfc get(String symbol) {
         try {
             Range[] tsData = this.redisTimeSeries.mget(true, filterSymbol(symbol), filterSource());
-            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
+            TreeMap<Long, MarketDataIfc> marketData = transform(symbol, tsData);
             return Optional.ofNullable(marketData.lastEntry()).isPresent() ? marketData.lastEntry().getValue() : null;
         } catch (JedisConnectionException e) {
             log.error("Exception while trying to get data for {}, error : {}", symbol, e.getMessage());
@@ -95,7 +95,7 @@ public class RedisRepositoryImpl implements Repository {
 
             Range[] tsData = redisTimeSeries.mrevrange(from, to, null, 0L, true, rowCount, filters);
 
-            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
+            TreeMap<Long, MarketDataIfc> marketData = transform(symbol, tsData);
             return new ArrayList<>(marketData.values());
         } catch (JedisException e) {
             log.error("Exception while trying to getting range of data for {}, error: {}", symbol, e.getMessage());
@@ -122,8 +122,8 @@ public class RedisRepositoryImpl implements Repository {
      * @param tsData    data to transform
      * @return  TreeMap with the time -> Data mapping
      */
-    private TreeMap<Long, MarketData> transform(String symbol, Range[] tsData) {
-        TreeMap<Long, MarketData> marketData = new TreeMap<>();
+    private TreeMap<Long, MarketDataIfc> transform(String symbol, Range[] tsData) {
+        TreeMap<Long, MarketDataIfc> marketData = new TreeMap<>();
         for (Range entry : tsData) {
             String key = entry.getKey();
             Value[] values = entry.getValues();
@@ -131,7 +131,7 @@ public class RedisRepositoryImpl implements Repository {
             for (Value value : values) {
                 Long time = value.getTime();
 
-                MarketData data = marketData.getOrDefault(time, new MarketData());
+                MarketDataIfc data = marketData.getOrDefault(time, new MarketData());
                 if (key.contains(PRICE)) {
                     data.setExchange(labels.getOrDefault(EXCHANGE, "-"));
                     data.setSymbol(symbol);

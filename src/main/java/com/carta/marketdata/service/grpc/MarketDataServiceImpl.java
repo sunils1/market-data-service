@@ -1,4 +1,4 @@
-package com.carta.marketdata.service;
+package com.carta.marketdata.service.grpc;
 
 
 import com.carta.marketdata.model.MarketDataIfc;
@@ -23,9 +23,9 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
     private static final String HEARTBEAT_MESSAGE = "[%s] Heart is still beating.";
     private static final int ROW_COUNT_DEFAULT = 20;
 
-    final private Repository repository;
+    final private Repository<MarketDataIfc> repository;
 
-    public MarketDataServiceImpl(Repository repository) {
+    public MarketDataServiceImpl(Repository<MarketDataIfc> repository) {
         this.repository = repository;
     }
 

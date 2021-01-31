@@ -1,9 +1,12 @@
-package com.carta.marketdata.collector;
+package com.carta.marketdata.collector.testdata;
 
+import com.carta.marketdata.collector.MarketDataCollector;
 import com.carta.marketdata.model.MarketData;
+import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.model.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,7 +16,8 @@ import java.util.*;
 
 @Slf4j
 @Component
-public class DummyDataCollector extends MarketDataCollector {
+@ConditionalOnProperty(prefix = "test.collector", name = "enable", havingValue = "true")
+public class TestDataCollector extends MarketDataCollector {
     private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList(
             "A", "AA", "AAPL", "ABC", "ABT", "ACE", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADT", "AEE", "AEP", "AES", "AET",
             "AFL", "AGN", "AIG", "AIV", "AIZ", "AKAM", "ALL", "ALTR", "ALXN", "AMAT", "AMD", "AMGN", "AMP", "AMT", "AMZN", "AN",
@@ -74,7 +78,7 @@ public class DummyDataCollector extends MarketDataCollector {
                 getExchange(), MarketDataSource.TEST, this.getVolume());
     }
 
-    public DummyDataCollector(Repository repository) {
+    public TestDataCollector(Repository<MarketDataIfc> repository) {
         super(repository);
     }
 
