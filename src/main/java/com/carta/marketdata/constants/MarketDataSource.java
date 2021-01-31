@@ -1,7 +1,7 @@
 package com.carta.marketdata.constants;
 
 public enum MarketDataSource {
-    TEST("TEST"),
+    TEST("UNKNOWN"),
     TWELVE_DATA("TWELVEDATA"),
     UNKNOWN("UNKNOWN");
 
