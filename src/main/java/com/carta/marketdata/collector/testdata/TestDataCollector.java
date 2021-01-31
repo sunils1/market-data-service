@@ -1,19 +1,23 @@
-package com.carta.marketdata.collector;
+package com.carta.marketdata.collector.testdata;
 
+import com.carta.marketdata.collector.MarketDataCollector;
+import com.carta.marketdata.model.MarketDataBase;
 import com.carta.marketdata.model.MarketData;
+import com.carta.marketdata.constants.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j
 @Component
-public class DummyDataCollector extends AbstractDataCollector {
+@ConditionalOnProperty(prefix = "test.collector", name = "enable", havingValue = "true")
+public class TestDataCollector extends MarketDataCollector {
     private static final Set<String> SYMBOLS = new HashSet<>(Arrays.asList(
             "A", "AA", "AAPL", "ABC", "ABT", "ACE", "ACN", "ADBE", "ADI", "ADM", "ADP", "ADSK", "ADT", "AEE", "AEP", "AES", "AET",
             "AFL", "AGN", "AIG", "AIV", "AIZ", "AKAM", "ALL", "ALTR", "ALXN", "AMAT", "AMD", "AMGN", "AMP", "AMT", "AMZN", "AN",
@@ -46,22 +50,20 @@ public class DummyDataCollector extends AbstractDataCollector {
             "WPO", "WPX", "WU", "WY", "WYN", "WYNN", "X", "XEL", "XL", "XLNX", "XOM", "XRAY", "XRX", "XYL", "YHOO", "YUM", "ZION", "ZMH"
     ));
 
-
     private String getExchange() {
         return "NASDAQ";
     }
 
-    private long getVolume() {
-        return Math.round(Math.random() * 1000);
+    private BigDecimal getVolume() {
+        return BigDecimal.valueOf(Math.round(Math.random() * 1000));
     }
 
     private ZonedDateTime getTime() {
         return ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
-    private BigDecimal getPrice(String sym) {
-        double price = Math.random() * (sym.hashCode() + System.currentTimeMillis() % 1000) / 1000.0;
-        return new BigDecimal(price, MathContext.DECIMAL32);
+    private double getPrice(String sym) {
+        return Math.random() * (sym.hashCode() + System.currentTimeMillis() % 1000) / 1000.0;
     }
 
     @Override
@@ -70,12 +72,13 @@ public class DummyDataCollector extends AbstractDataCollector {
     }
 
     @Override
-    public MarketData getData(String symbol) {
+    public MarketDataBase getData(String symbol) {
         sleep();
-        return new MarketData(symbol, getTime(), getPrice(symbol), getExchange(), getVolume());
+        return new MarketDataBase(symbol, getTime(), BigDecimal.valueOf(getPrice(symbol)),
+                getExchange(), MarketDataSource.TEST, this.getVolume());
     }
 
-    public DummyDataCollector(Repository repository) {
+    public TestDataCollector(Repository<MarketData> repository) {
         super(repository);
     }
 

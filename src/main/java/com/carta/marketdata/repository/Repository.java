@@ -1,17 +1,23 @@
 package com.carta.marketdata.repository;
 
-import com.carta.marketdata.model.MarketData;
+import java.util.List;
 
-import java.util.Map;
+public interface Repository<R> {
+    /**
+     * Get the latest for the symbol
+     * @param key   key to search on
+     * @return      data returned
+     */
+    R get(String key);
 
-public interface Repository {
-    void save(MarketData marketData);
+    /**
+     * get multiple data sets, based on the row count
+     *
+     * @param key       key to search on
+     * @param rowCount  row count to return
+     * @return          list of data returned
+     */
+    List<R> get(String key, int rowCount);
 
-    Map<String, MarketData> findAll();
-
-    MarketData findById(String symbol);
-
-    void update(MarketData marketData);
-
-    void delete(String symbol);
+    void add(R data);
 }
