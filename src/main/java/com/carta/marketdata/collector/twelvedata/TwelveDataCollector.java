@@ -2,6 +2,7 @@ package com.carta.marketdata.collector.twelvedata;
 
 import com.carta.marketdata.collector.MarketDataCollector;
 import com.carta.marketdata.helper.RestClient;
+import com.carta.marketdata.helper.Util;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.model.MarketDataSource;
@@ -54,9 +55,7 @@ public class TwelveDataCollector extends MarketDataCollector {
 
     private final RestClient<TwelveDataResponse> client;
 
-    private ZonedDateTime getUTCTime(long timeMs) {
-        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(timeMs), ZoneId.of("UTC"));
-    }
+
 
     @SneakyThrows
     @Override
@@ -75,10 +74,10 @@ public class TwelveDataCollector extends MarketDataCollector {
         sdf.setTimeZone(TimeZone.getTimeZone(response.getMeta().getExchange_timezone()));
         Date date = sdf.parse(datetime);
 
-//        TODO:: move to adapter
+        // TODO:: move to adapter
         return new MarketData(
                 response.getMeta().getSymbol(),
-                getUTCTime(date.getTime()),
+                Util.getUTCTime(date.getTime()),
                 new BigDecimal(value.getClose()),
                 response.getMeta().exchange,
                 MarketDataSource.TWELVE_DATA,

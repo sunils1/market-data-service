@@ -1,5 +1,6 @@
 package com.carta.marketdata.repository;
 
+import com.carta.marketdata.helper.Util;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.model.MarketDataSource;
@@ -135,7 +136,7 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
                 if (key.contains(PRICE)) {
                     data.setExchange(labels.getOrDefault(EXCHANGE, "-"));
                     data.setSymbol(symbol);
-                    data.setDateTimeU(getUTCTime(value));
+                    data.setDateTimeU(Util.getUTCTime(value.getTime()));
                     data.setPrice(BigDecimal.valueOf(value.getValue()));
                     data.setMarketDataSource(MarketDataSource.valueOf(
                             labels.getOrDefault(SOURCE, MarketDataSource.UNKNOWN.name())));
