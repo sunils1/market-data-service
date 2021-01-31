@@ -3,7 +3,7 @@ package com.carta.marketdata.collector.testdata;
 import com.carta.marketdata.collector.MarketDataCollector;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
-import com.carta.marketdata.model.MarketDataSource;
+import com.carta.marketdata.constants.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

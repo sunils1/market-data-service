@@ -5,7 +5,7 @@ import com.carta.marketdata.helper.RestClient;
 import com.carta.marketdata.helper.Util;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
-import com.carta.marketdata.model.MarketDataSource;
+import com.carta.marketdata.constants.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j

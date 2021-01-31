@@ -1,5 +1,6 @@
 package com.carta.marketdata.model;
 
+import com.carta.marketdata.constants.MarketDataSource;
 import lombok.*;
 
 import java.io.Serial;

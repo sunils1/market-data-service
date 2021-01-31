@@ -1,5 +1,7 @@
 package com.carta.marketdata.model;
 
+import com.carta.marketdata.constants.MarketDataSource;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 

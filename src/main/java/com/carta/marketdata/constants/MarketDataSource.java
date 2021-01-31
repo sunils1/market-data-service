@@ -1,10 +1,8 @@
-package com.carta.marketdata.model;
+package com.carta.marketdata.constants;
 
 public enum MarketDataSource {
     TEST("TEST"),
     TWELVE_DATA("TWELVEDATA"),
-    XPRESSFEED("XPRESSFEED"),
-    MANUAL("MANUAL"),
     UNKNOWN("UNKNOWN");
 
     private final String value;

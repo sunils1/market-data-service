@@ -3,7 +3,7 @@ package com.carta.marketdata.repository;
 import com.carta.marketdata.helper.Util;
 import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.model.MarketDataIfc;
-import com.carta.marketdata.model.MarketDataSource;
+import com.carta.marketdata.constants.MarketDataSource;
 import com.redislabs.redistimeseries.*;
 
 import lombok.extern.slf4j.Slf4j;
