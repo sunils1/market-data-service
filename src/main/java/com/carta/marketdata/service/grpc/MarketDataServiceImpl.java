@@ -1,7 +1,7 @@
 package com.carta.marketdata.service.grpc;
 
 
-import com.carta.marketdata.model.MarketDataIfc;
+import com.carta.marketdata.model.MarketData;
 import com.carta.marketdata.repository.Repository;
 import com.carta.marketdata.service.lib.*;
 import io.grpc.stub.StreamObserver;
@@ -23,9 +23,9 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
     private static final String HEARTBEAT_MESSAGE = "[%s] Heart is still beating.";
     private static final int ROW_COUNT_DEFAULT = 20;
 
-    final private Repository<MarketDataIfc> repository;
+    final private Repository<MarketData> repository;
 
-    public MarketDataServiceImpl(Repository<MarketDataIfc> repository) {
+    public MarketDataServiceImpl(Repository<MarketData> repository) {
         this.repository = repository;
     }
 
@@ -43,7 +43,7 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
     public void spot(SpotRequest request, StreamObserver<MarketDataReply> responseObserver) {
         String symbol = request.getSymbol();
 
-        MarketDataIfc data = repository.get(symbol);
+        MarketData data = repository.get(symbol);
         MarketDataReply reply;
         if (Optional.ofNullable(data).isPresent()) {
             reply = MarketDataReply.newBuilder()
@@ -63,7 +63,7 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
         responseObserver.onCompleted();
     }
 
-    public MarketDataReply getReply(MarketDataIfc data) {
+    public MarketDataReply getReply(MarketData data) {
         return MarketDataReply.newBuilder()
                 .setSymbol(data.getSymbol())
                 .setPrice(data.getPrice().doubleValue())
@@ -82,7 +82,7 @@ public class MarketDataServiceImpl extends MarketDataServiceGrpc.MarketDataServi
             rowCount = ROW_COUNT_DEFAULT;
         }
 
-        List<MarketDataIfc> all = repository.get(symbol, rowCount);
+        List<MarketData> all = repository.get(symbol, rowCount);
         TimeSeriesMarketDataReply.Builder builder = TimeSeriesMarketDataReply.newBuilder();
 
         if (Optional.ofNullable(all).isPresent()) {

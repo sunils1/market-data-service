@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MarketDataTest {
+class MarketDataBaseTest {
 
     @Test
     void testToString() {

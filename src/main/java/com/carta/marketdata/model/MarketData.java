@@ -1,26 +1,22 @@
 package com.carta.marketdata.model;
 
 import com.carta.marketdata.constants.MarketDataSource;
-import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class MarketData implements Serializable, MarketDataIfc {
-    @Serial
-    private static final long serialVersionUID = -5835892724045349889L;
+public interface MarketData {
+    String getSymbol();
+    ZonedDateTime getDateTimeU();
+    BigDecimal getPrice();
+    String getExchange();
+    MarketDataSource getMarketDataSource();
+    BigDecimal getVolume();
 
-    private String symbol;
-    private ZonedDateTime dateTimeU;
-    private BigDecimal price;
-    private String exchange;
-    private MarketDataSource marketDataSource;
-    private BigDecimal volume;
+    void setSymbol(String symbol);
+    void setDateTimeU(ZonedDateTime dateTimeU);
+    void setPrice(BigDecimal price);
+    void setExchange(String exchange);
+    void setMarketDataSource(MarketDataSource source);
+    void setVolume(BigDecimal volume);
 }

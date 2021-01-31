@@ -1,8 +1,8 @@
 package com.carta.marketdata.repository;
 
 import com.carta.marketdata.helper.Util;
+import com.carta.marketdata.model.MarketDataBase;
 import com.carta.marketdata.model.MarketData;
-import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.constants.MarketDataSource;
 import com.redislabs.redistimeseries.*;
 
@@ -21,7 +21,7 @@ import static com.carta.marketdata.constants.MarketDataConstants.*;
 
 @Slf4j
 @org.springframework.stereotype.Repository
-public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
+public class RedisRepositoryImpl implements Repository<MarketData> {
     private static final String KEY_SEPARATOR = ":";
     private static final int HOURS_LIMIT = 25;
 
@@ -37,7 +37,7 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
      * @param marketData market data to be added
      */
     @Override
-    public void add(MarketDataIfc marketData) {
+    public void add(MarketData marketData) {
         Map<String, String> labels = new HashMap<>();
         labels.put(EXCHANGE, marketData.getExchange());
         labels.put(SYMBOL, marketData.getSymbol());
@@ -69,10 +69,10 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
      * @return market data information
      */
     @Override
-    public MarketDataIfc get(String symbol) {
+    public MarketData get(String symbol) {
         try {
             Range[] tsData = this.redisTimeSeries.mget(true, filterSymbol(symbol), filterSource());
-            TreeMap<Long, MarketDataIfc> marketData = transform(symbol, tsData);
+            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
             return Optional.ofNullable(marketData.lastEntry()).isPresent() ? marketData.lastEntry().getValue() : null;
         } catch (JedisConnectionException e) {
             log.error("Exception while trying to get data for {}, error : {}", symbol, e.getMessage());
@@ -88,7 +88,7 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
      * @return List of MarketData
      */
     @Override
-    public List<MarketDataIfc> get(String symbol, int rowCount) {
+    public List<MarketData> get(String symbol, int rowCount) {
         try {
             long to = System.currentTimeMillis();
             long from = to - TimeUnit.HOURS.toMillis(HOURS_LIMIT);
@@ -96,7 +96,7 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
 
             Range[] tsData = redisTimeSeries.mrevrange(from, to, null, 0L, true, rowCount, filters);
 
-            TreeMap<Long, MarketDataIfc> marketData = transform(symbol, tsData);
+            TreeMap<Long, MarketData> marketData = transform(symbol, tsData);
             return new ArrayList<>(marketData.values());
         } catch (JedisException e) {
             log.error("Exception while trying to getting range of data for {}, error: {}", symbol, e.getMessage());
@@ -123,8 +123,8 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
      * @param tsData    data to transform
      * @return  TreeMap with the time -> Data mapping
      */
-    private TreeMap<Long, MarketDataIfc> transform(String symbol, Range[] tsData) {
-        TreeMap<Long, MarketDataIfc> marketData = new TreeMap<>();
+    private TreeMap<Long, MarketData> transform(String symbol, Range[] tsData) {
+        TreeMap<Long, MarketData> marketData = new TreeMap<>();
         for (Range entry : tsData) {
             String key = entry.getKey();
             Value[] values = entry.getValues();
@@ -132,7 +132,7 @@ public class RedisRepositoryImpl implements Repository<MarketDataIfc> {
             for (Value value : values) {
                 Long time = value.getTime();
 
-                MarketDataIfc data = marketData.getOrDefault(time, new MarketData());
+                MarketData data = marketData.getOrDefault(time, new MarketDataBase());
                 if (key.contains(PRICE)) {
                     data.setExchange(labels.getOrDefault(EXCHANGE, "-"));
                     data.setSymbol(symbol);

@@ -3,8 +3,8 @@ package com.carta.marketdata.collector.twelvedata;
 import com.carta.marketdata.collector.MarketDataCollector;
 import com.carta.marketdata.helper.RestClient;
 import com.carta.marketdata.helper.Util;
+import com.carta.marketdata.model.MarketDataBase;
 import com.carta.marketdata.model.MarketData;
-import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.constants.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.SneakyThrows;
@@ -21,7 +21,7 @@ import java.util.*;
 @Component
 @ConditionalOnProperty(prefix = "twelvedata.collector", name = "enable", havingValue = "true")
 public class TwelveDataCollector extends MarketDataCollector {
-    protected TwelveDataCollector(Repository<MarketDataIfc> repository,
+    protected TwelveDataCollector(Repository<MarketData> repository,
                                   RestClient<TwelveDataResponse> client) {
         super(repository);
         this.client = client;
@@ -56,7 +56,7 @@ public class TwelveDataCollector extends MarketDataCollector {
 
     @SneakyThrows
     @Override
-    public MarketData getData(String key) {
+    public MarketDataBase getData(String key) {
         Map<String, Object> params = new HashMap<>();
 
         params.put(SYMBOL, key);
@@ -72,7 +72,7 @@ public class TwelveDataCollector extends MarketDataCollector {
         Date date = sdf.parse(datetime);
 
         // TODO:: move to adapter
-        return new MarketData(
+        return new MarketDataBase(
                 response.getMeta().getSymbol(),
                 Util.getUTCTime(date.getTime()),
                 new BigDecimal(value.getClose()),

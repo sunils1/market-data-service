@@ -1,8 +1,8 @@
 package com.carta.marketdata.collector.testdata;
 
 import com.carta.marketdata.collector.MarketDataCollector;
+import com.carta.marketdata.model.MarketDataBase;
 import com.carta.marketdata.model.MarketData;
-import com.carta.marketdata.model.MarketDataIfc;
 import com.carta.marketdata.constants.MarketDataSource;
 import com.carta.marketdata.repository.Repository;
 import lombok.extern.slf4j.Slf4j;
@@ -72,13 +72,13 @@ public class TestDataCollector extends MarketDataCollector {
     }
 
     @Override
-    public MarketData getData(String symbol) {
+    public MarketDataBase getData(String symbol) {
         sleep();
-        return new MarketData(symbol, getTime(), BigDecimal.valueOf(getPrice(symbol)),
+        return new MarketDataBase(symbol, getTime(), BigDecimal.valueOf(getPrice(symbol)),
                 getExchange(), MarketDataSource.TEST, this.getVolume());
     }
 
-    public TestDataCollector(Repository<MarketDataIfc> repository) {
+    public TestDataCollector(Repository<MarketData> repository) {
         super(repository);
     }
 
