@@ -46,11 +46,11 @@ public class RedisRepositoryImpl implements Repository<MarketData> {
 
         try {
             this.redisTimeSeries.add(
-                    getTimeSeriesKey(marketData.getMarketDataSource().name(), marketData.getSymbol(), PRICE),
+                    getTimeSeriesKey(marketData.getMarketDataSource().toString(), marketData.getSymbol(), PRICE),
                     timestamp,
                     marketData.getPrice().doubleValue(), labels);
             this.redisTimeSeries.add(
-                    getTimeSeriesKey(marketData.getMarketDataSource().name(), marketData.getSymbol(), VOLUME),
+                    getTimeSeriesKey(marketData.getMarketDataSource().toString(), marketData.getSymbol(), VOLUME),
                     timestamp,
                     marketData.getVolume().doubleValue(), labels);
             log.info("Added to ts with timestamp: {} ({}), price: {}, volume: {}, labels : {}",
@@ -81,7 +81,7 @@ public class RedisRepositoryImpl implements Repository<MarketData> {
     }
 
     /**
-     * Get timeseries marketdata
+     * Get time-series market-data
      *
      * @param symbol   symbol for query
      * @param rowCount row count for return
@@ -139,7 +139,7 @@ public class RedisRepositoryImpl implements Repository<MarketData> {
                     data.setDateTimeU(Util.getUTCTime(value.getTime()));
                     data.setPrice(BigDecimal.valueOf(value.getValue()));
                     data.setMarketDataSource(MarketDataSource.valueOf(
-                            labels.getOrDefault(SOURCE, MarketDataSource.UNKNOWN.name())));
+                            labels.getOrDefault(SOURCE, MarketDataSource.UNKNOWN.toString())));
                 }
 
                 if (key.contains(VOLUME)) {
